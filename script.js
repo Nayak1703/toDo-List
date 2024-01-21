@@ -10,8 +10,6 @@ let date = today.getDate();
 let year = today.getFullYear();
 subH.textContent = `${day}, ${month} ${date}, ${year}`;
 
-let footer = document.querySelector("#footText");
-footer.innerText = `© Todo ${year} Yash nayak`;
 // +++++++++++++++ adding new todo to the list ++++++++++++++++++
 let taskForm = document.querySelector("#addNewTaskForm");
 let todoList = document.querySelector("#todo-list");
@@ -34,6 +32,7 @@ taskForm.addEventListener("submit", (e) => {
     getTaskInput.value = "";
     getTaskInput.focus();
     taskCheck();
+    deletTask();
   } else {
     document.getElementById("errorMsg").textContent = "Please enter the task.";
     getTaskInput.value = "";
@@ -46,13 +45,16 @@ function handleNewtask(task) {
   newTask.innerHTML = `
       <input class="form-check-input me-1" id="todo-${count}" type="checkbox" style="background-color:#1D2B53">
       <label class="form-check-label" for="todo-${count}">
-      <span><strong>${task}</strong></span>
-    </label>`;
+      ${task}
+    </label>  <i id="crossMark-${count}" class="fa-solid fa-xmark"></i>`;
   newTask.setAttribute("class", "list-group-item p-2");
+  newTask.setAttribute("id", `list-group-item-${count}`);
   todoList.append(newTask);
   taskName = "";
   allTaskData[`todo-${count}`] = task;
   localStorage.setItem("taskData", JSON.stringify(allTaskData));
+
+  deletTask(`list-group-item-${count}`);
   count++;
 }
 
@@ -63,19 +65,13 @@ function taskCheck() {
   let allCheck = document.querySelectorAll(".form-check-input");
   let allLabel = document.querySelectorAll(".form-check-label");
 
-  // console.log(allCheck[0]);
   for (let i = 0; i < allCheck.length; i++) {
     allCheck[i].addEventListener("change", function (e) {
       if (this.checked) {
         allLabel[i].style.textDecoration = "line-through";
-        // allList[i].style.backgroundColor = "#96fa96";
       } else {
         allLabel[i].style.textDecoration = "none";
-        // allList[i].style.backgroundColor = "#ffffff";
       }
-      // console.log(allLabel[i]);
-      // console.log(allLabel[i].textContent);
-      // allLabel[i].textContent.style.textDecoration = "line-through";
     });
   }
 }
@@ -93,7 +89,7 @@ clearAllBtn.addEventListener("click", (e) => {
 // fetching the store the task from local storage
 document.addEventListener("DOMContentLoaded", function () {
   let browserObj = JSON.parse(localStorage.getItem("taskData"));
-  console.log(browserObj);
+  // console.log(browserObj);
   // let size = Object.keys(browserObj).length;
 
   for (let keyValue in browserObj) {
@@ -102,3 +98,23 @@ document.addEventListener("DOMContentLoaded", function () {
     taskCheck();
   }
 });
+
+// +++++++++++++++++++ delete +++++++++++++++++++++++++
+// let
+// cross.addEventListener("click", deletTask);
+
+function deletTask() {
+  let listItems = document.querySelectorAll(".list-group-item");
+  let allCheck = document.querySelectorAll(".form-check-input");
+  let allCross = document.querySelectorAll(".fa-solid");
+  for (let i = 0; i < allCross.length; i++) {
+    allCross[i].addEventListener("click", function (e) {
+      if (this.click) {
+        // console.log(allCheck[i].id);
+        delete allTaskData[allCheck[i].id];
+        localStorage.setItem("taskData", JSON.stringify(allTaskData));
+        listItems[i].remove();
+      }
+    });
+  }
+}
